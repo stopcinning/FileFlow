@@ -47,34 +47,33 @@ estimated, and there is no account to create.
 
 ## Installation
 
-Grab `FileFlow.exe` from the [releases page](https://github.com/stopcinning/FileFlow/releases)
-and run it. No installer, no Python, no dependencies.
-
-Windows will warn the first time you run it, because the executable is not
-code-signed. Click *More info* → *Run anyway*.
-
-### From source
-
-Needs Python 3.11 or newer.
-
 ```bash
 git clone https://github.com/stopcinning/FileFlow.git
 cd FileFlow
 python -m venv .venv
 .venv\Scripts\activate
 pip install -e ".[dev]"
-```
-
-Run it from source:
-
-```bash
 python -m fileflow
 ```
 
-Build the executable yourself:
+Needs Python 3.11 or newer. There is no installer.
+
+To build a standalone executable instead — one file, no Python needed to run
+it:
 
 ```bash
 python scripts\build.py
+```
+
+That writes `dist\FileFlow.exe`, about 46 MB. It is unsigned, so Windows
+SmartScreen warns on first run; click *More info* → *Run anyway*.
+
+### Command line
+
+```
+python -m fileflow                 # open with the folder picker
+python -m fileflow C:\Users\me\Downloads
+fileflow --help
 ```
 
 ## Quick start
@@ -182,11 +181,12 @@ Deleting `journal.db` discards the undo history. It does not touch your files.
 Roughly in order. See [ROADMAP.md](ROADMAP.md) for detail.
 
 - [ ] Bulk rename dialog with a live before/after preview
-- [ ] Watch a folder and apply rules as files land
+- [ ] Clean up the quarantine folder from the UI
+- [ ] Folder templates
 - [ ] Per-folder rule sets, so Downloads and Photos behave differently
+- [ ] Watch a folder and apply rules as files land
 - [ ] Export the activity log to CSV
 - [ ] macOS build
-- [ ] Clean up the quarantine folder from the UI
 
 ## Known issues
 
