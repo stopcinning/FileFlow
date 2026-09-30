@@ -20,6 +20,10 @@ VERSION_FILE = ROOT / "packaging" / "version_info.txt"
 
 ONEDIR = os.environ.get("FILEFLOW_ONEDIR") == "1"
 
+# A windowed build has no stderr, so a crash is silent and gives no traceback.
+# FILEFLOW_CONSOLE=1 produces a console build for diagnosing exactly that.
+CONSOLE = os.environ.get("FILEFLOW_CONSOLE") == "1"
+
 block_cipher = None
 
 # PySide6 ships a lot of modules that are not used and that fail to bundle
@@ -41,7 +45,10 @@ excludes = [
 hiddenimports = collect_submodules("fileflow")
 
 a = Analysis(  # noqa: F821
-    [str(SRC / "fileflow" / "__main__.py")],
+    # A launcher in this directory, not src/fileflow/__main__.py: PyInstaller
+    # runs the entry script as a top-level module, so the relative imports in
+    # __main__.py have no parent package to resolve against.
+    [str(ROOT / "packaging" / "entry_point.py")],
     pathex=[str(SRC)],
     binaries=[],
     datas=[],
@@ -58,18 +65,14 @@ a = Analysis(  # noqa: F821
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)  # noqa: F821
 
-exe = EXE(  # noqa: F821
-    pyz,
-    a.scripts,
-    [],
-    exclude_binaries=True,
+OPTIONS = dict(
     name="FileFlow",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     upx_exclude=[],
-    console=False,  # GUI app: no console window
+    console=CONSOLE,  # GUI app: no console window unless debugging
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
@@ -79,21 +82,15 @@ exe = EXE(  # noqa: F821
     version=str(VERSION_FILE) if VERSION_FILE.exists() else None,
 )
 
+# The two layouts are structurally different and cannot share one EXE() call.
+# PyInstaller consumes the EXE object during construction, so assigning to
+# `exe.binaries` afterwards silently produces an empty executable rather than
+# reporting an error.
 if ONEDIR:
-    coll = COLLECT(  # noqa: F821
-        exe,
-        a.binaries,
-        a.zipfiles,
-        a.datas,
-        strip=False,
-        upx=True,
-        upx_exclude=[],
-        name="FileFlow",
-    )
+    # Files stay on disk next to the exe. Faster to start, nothing to extract.
+    exe = EXE(pyz, a.scripts, [], exclude_binaries=True, **OPTIONS)
+    coll = COLLECT(exe, a.binaries, a.zipfiles, a.datas, strip=False, upx=True, name="FileFlow")
 else:
-    # Single file: everything is folded into the executable and extracted to a
-    # temporary directory at launch. Slower to start, but it is one file to
-    # download and nothing to install.
-    exe.binaries = a.binaries
-    exe.zipfiles = a.zipfiles
-    exe.datas = a.datas
+    # Single file: everything is folded in and extracted to a temp directory at
+    # launch. Slower to start, but it is one file to download.
+    exe = EXE(pyz, a.scripts, a.binaries, a.zipfiles, a.datas, [], **OPTIONS)

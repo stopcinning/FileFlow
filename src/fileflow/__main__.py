@@ -50,7 +50,10 @@ def main(argv: list[str] | None = None) -> int:
     log.info("FileFlow %s starting", __version__)
     log.debug("log file: %s", log_path)
 
-    QApplication.setAttribute("__qt_auto_scale_high_dpi", True)
+    # No high-DPI attribute is set here: Qt 6 scales for high-DPI displays by
+    # default, and the Qt5-era QApplication.setAttribute call raises a
+    # TypeError on PySide6 because it now wants the enum, not a string.
+
     app = QApplication(sys.argv[:1])
     app.setApplicationName("FileFlow")
     app.setApplicationVersion(__version__)

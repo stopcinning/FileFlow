@@ -42,6 +42,11 @@ def main() -> int:
         help="Build a folder of files instead of a single exe (faster startup)",
     )
     parser.add_argument("--clean", action="store_true", help="Remove build/ and dist/ first")
+    parser.add_argument(
+        "--console",
+        action="store_true",
+        help="Build a console build that prints tracebacks, for debugging a crash",
+    )
     args = parser.parse_args()
 
     ensure_requirements()
@@ -60,6 +65,7 @@ def main() -> int:
     # supplied, so the layout is chosen through the environment instead.
     env = dict(os.environ)
     env["FILEFLOW_ONEDIR"] = "1" if args.onedir else "0"
+    env["FILEFLOW_CONSOLE"] = "1" if args.console else "0"
 
     command = [
         sys.executable, "-m", "PyInstaller",
@@ -73,21 +79,29 @@ def main() -> int:
     started = time.perf_counter()
 
     result = subprocess.run(command, cwd=ROOT, env=env)
-
-    print("$", " ".join(command))
-    started = time.perf_counter()
-
-    result = subprocess.run(command, cwd=ROOT)
     if result.returncode != 0:
         print(f"\nbuild failed after {time.perf_counter() - started:.0f}s")
         return result.returncode
 
     elapsed = time.perf_counter() - started
-    print(f"\nbuild finished in {elapsed:.0f}s")
 
-    for produced in sorted(DIST.rglob("FileFlow.exe")):
-        size_mb = produced.stat().st_size / 1024**2
-        print(f"  {produced.relative_to(ROOT)}  ({size_mb:.1f} MB)")
+    # PyInstaller can report success and still write nothing: a malformed spec
+    # produces no executable at all without a non-zero exit code. Verify the
+    # artifact rather than trusting the exit status.
+    produced = sorted(DIST.rglob("FileFlow.exe"))
+    if not produced:
+        print(f"\nbuild reported success in {elapsed:.0f}s but produced no executable.")
+        print(f"expected one under {DIST}")
+        return 1
+
+    print(f"\nbuild finished in {elapsed:.0f}s")
+    for exe in produced:
+        size_mb = exe.stat().st_size / 1024**2
+        print(f"  {exe.relative_to(ROOT)}  ({size_mb:.1f} MB)")
+
+        if size_mb < 1:
+            print("    error: that is too small to contain the application")
+            return 1
 
     print("\nThe executable is unsigned, so Windows SmartScreen will warn on first run.")
     return 0
