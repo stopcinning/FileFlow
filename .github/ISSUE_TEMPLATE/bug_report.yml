@@ -1,0 +1,69 @@
+name: Bug report
+description: Something FileFlow did wrong, or did not do
+title: ""
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. If a file ended up somewhere you did not
+        expect, say so below — that gets prioritised over a crash.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did FileFlow do, and what did you expect instead?
+      placeholder: |
+        I pressed "Sort into folders" on a folder with 300 files. Expected the
+        PDFs to move to Documents/. Instead two files vanished from the list.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce
+      description: Steps from opening the folder onwards.
+      placeholder: |
+        1. Open folder C:\Users\me\Downloads
+        2. Press "Sort into folders"
+        3. ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: FileFlow version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: windows
+    attributes:
+      label: Windows version
+      options:
+        - Windows 11
+        - Windows 10
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: |
+        Optional. `%APPDATA%\FileFlow\fileflow.log` — paste the last few lines if
+        there is anything there.
+      render: text
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety
+      options:
+        - label: I did not lose any files
+          required: true

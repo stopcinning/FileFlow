@@ -1,0 +1,49 @@
+name: Feature request
+description: Suggest something FileFlow should do
+title: ""
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Most of the roadmap came from issues like this one.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: |
+        What were you trying to do that FileFlow made hard? Describe the
+        situation, not the solution — the solution is usually better once we
+        know what you were actually up against.
+      placeholder: |
+        Every month I have to open 40 screenshots from my camera and rename them
+        by hand. I want the date in the name so they sort.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you have in mind
+      description: Optional. Rough is fine.
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What are you doing now instead?
+      description: |
+        If you have a workaround, or a script you run, that is useful
+        information. Include it if you are willing.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety
+      options:
+        - label: This should be something FileFlow can do without deleting anything
+          required: true
