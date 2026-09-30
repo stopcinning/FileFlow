@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fileflow"
+version = "0.1.0"
+description = "A file organiser that works on real folders"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = ["PySide6>=6.7"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6", "pyinstaller>=6.10"]
+
+[project.gui-scripts]
+fileflow = "fileflow.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 95
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = [
+    "E501",   # line length is handled by the formatter
+    "B008",   # function call in default arg is fine for our Qt-free core
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/fileflow/ui/*" = ["N"]  # Qt naming conventions are not ours to fight
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"
