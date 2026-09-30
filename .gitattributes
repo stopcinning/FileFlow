@@ -1,0 +1,13 @@
+# Normalise line endings on checkin; keep them native in the working tree.
+* text=auto
+
+*.py text diff=python
+*.md text
+*.toml text
+*.json text
+*.jsonc text
+*.txt text
+*.spec text
+*.ico binary
+*.png binary
+*.exe binary

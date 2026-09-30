@@ -16,18 +16,17 @@ from pathlib import Path
 os.environ.pop("QT_QPA_PLATFORM", None)
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from PySide6.QtCore import QPointF, QRectF, Qt  # noqa: E402
-from PySide6.QtGui import (  # noqa: E402
+from PySide6.QtCore import QPointF, QRectF, Qt
+from PySide6.QtGui import (
     QBrush,
     QColor,
-    QFont,
     QImage,
     QLinearGradient,
     QPainter,
     QPainterPath,
     QPen,
 )
-from PySide6.QtWidgets import QApplication  # noqa: E402
+from PySide6.QtWidgets import QApplication
 
 OUT = Path(__file__).resolve().parents[1] / "packaging" / "fileflow.ico"
 SIZES = (16, 24, 32, 48, 64, 128, 256)
